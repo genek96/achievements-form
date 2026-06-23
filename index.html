@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Форма заявки — Школа 21</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F4F9;
+      --card: #FFFFFF;
+      --green: #172034;
+      --green-dark: #0f1825;
+      --dark: #0D1117;
+      --text: #111318;
+      --muted: #8B8FA8;
+      --border: #E8E8F0;
+      --input-bg: #F7F8FC;
+      --red: #FF4D4D;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ── Header ── */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 56px;
+      background: #F4F4F9;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      border-bottom: 1px solid #E4E4EE;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .logo svg {
+      height: 36px;
+      width: auto;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      padding-top: 56px;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-bottom: 80px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 760px;
+      margin: 40px 16px 0;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+
+    /* ── Card header ── */
+    .card-head {
+      background: #070B19;
+      padding: 36px 48px 32px;
+    }
+    .card-head-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #21BA72;
+      margin-bottom: 10px;
+    }
+    .card-head h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .card-head p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+    }
+    .card-head p span { color: var(--red); }
+
+    /* ── Card body ── */
+    .card-body {
+      padding: 0;
+    }
+
+    /* ── Section ── */
+    .section {
+      padding: 36px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Field ── */
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+    label.field-label .req { color: var(--red); margin-left: 2px; }
+    label.field-label .opt { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 4px; }
+
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #F4F4F9;
+      transition: box-shadow 0.18s, background 0.18s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="date"] { position: relative; cursor: pointer; }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      background: #EBEBF3;
+      box-shadow: none;
+    }
+    /* внутри карточки ачивки — белые поля */
+    .ach-card input, .ach-card textarea, .ach-card select {
+      background: #fff;
+    }
+    .ach-card input:focus, .ach-card textarea:focus {
+      background: #f8f8fb;
+    }
+    textarea { resize: vertical; min-height: 84px; }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── Pill radio ── */
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      cursor: pointer;
+    }
+    .pill input { display: none; }
+    .pill span {
+      display: inline-block;
+      padding: 9px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--input-bg);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .pill input:checked + span,
+    .pill-green input:checked + span {
+      background: #172034;
+      color: #fff;
+    }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+
+    /* ── Upload ── */
+    .upload-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .upload-drop {
+      border: 1.5px dashed #D0D4E4;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: #F4F4F9;
+      position: relative;
+      width: 100%;
+    }
+    .upload-drop:hover { border-color: #172034; background: #EEEFF5; }
+    .upload-drop.dragover { border-color: #172034; background: #E8EAF2; }
+    .upload-drop input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+      border: none; background: none; padding: 0;
+    }
+    .upload-drop-icon { font-size: 18px; flex-shrink: 0; }
+    .upload-drop-text { font-size: 13px; color: var(--muted); }
+    .upload-drop-text strong { color: var(--text); font-weight: 600; }
+    .upload-previews {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .upload-thumb {
+      position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .upload-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .upload-thumb-del {
+      position: absolute; top: 3px; right: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); color: #fff;
+      border: none; cursor: pointer; font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+
+    /* ── Conditional ── */
+    .cond { display: none; }
+    .cond.on { display: block; }
+
+    /* ── Achievement card ── */
+    .ach-card {
+      border: none;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 12px;
+      background: #F4F4F9;
+    }
+    .ach-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .ach-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .btn-del {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+    .btn-del:hover { color: var(--red); }
+
+    .btn-add-card {
+      width: 100%;
+      padding: 11px;
+      border: 1.5px dashed #D0D4E4;
+      border-radius: 10px;
+      background: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      margin-top: 4px;
+    }
+    .btn-add-card:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── Footer ── */
+    /* все секции без border-bottom — разделитель рисует card-foot */
+    .section {
+      border-bottom: none !important;
+    }
+    .card-foot {
+      padding: 24px 48px 36px;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .foot-divider { display: none; }
+    .foot-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(90deg, #6AEC6C 0%, #1BD38B 49%, #34BBCE 100%);
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.01em;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 6px 24px rgba(27,211,139,0.35);
+    }
+    .btn-submit:hover {
+      opacity: 0.9;
+      box-shadow: 0 8px 28px rgba(27,211,139,0.45);
+    }
+    .btn-submit:active { transform: scale(0.99); }
+
+    /* ── Jira banner ── */
+    .jira-banner {
+      margin: 0 48px 0;
+      padding: 14px 18px;
+      background: #EEF3FF;
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      color: #3A4A6B;
+      line-height: 1.5;
+      border: none;
+    }
+    /* баннер внутри formBody — добавляем отступ снизу, без разделителей */
+    #formBody > .jira-banner {
+      margin: 24px 48px 0;
+    }
+    .jira-banner strong { color: #1A2B52; }
+
+    /* ── Success ── */
+    .success-overlay {
+      display: none;
+      padding: 64px 48px;
+      text-align: center;
+    }
+    .success-overlay.on { display: block; }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(61,237,151,0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+    }
+    .success-overlay h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .success-overlay p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 580px) {
+      .card-head, .section, .card-foot { padding-left: 24px; padding-right: 24px; }
+      .field-row { grid-template-columns: 1fr; }
+      .card-foot { flex-direction: column; align-items: stretch; }
+      .btn-submit { text-align: center; }
+    }
+
+    /* ── Print styles ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body { background: #fff; padding: 0; margin: 0; }
+      .header, .card-foot, .jira-banner, .upload-drop, .btn-del,
+      .pill-group, .section-label { display: none !important; }
+      .page { padding: 0; display: block; }
+      .card { box-shadow: none; border-radius: 0; margin: 0; max-width: 100%; }
+      .card-head { border-radius: 0; padding: 24px 32px 20px; }
+      .section { padding: 16px 32px; page-break-inside: avoid; }
+      .field { margin-bottom: 12px; }
+      .field-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .cond { display: none !important; }
+      .cond.on { display: block !important; }
+      input, textarea { display: none !important; }
+      .print-val {
+        display: block !important;
+        background: #F4F4F9;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 13px;
+        color: #111;
+        min-height: 32px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .print-val.empty { color: #aaa; font-style: italic; }
+      .upload-previews { display: flex !important; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+      .upload-thumb { width: 80px; height: 80px; border-radius: 6px; overflow: hidden; page-break-inside: avoid; }
+      .upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
+      .upload-thumb-del { display: none !important; }
+      .ach-card { background: #F4F4F9; border-radius: 10px; padding: 12px; margin-bottom: 10px; page-break-inside: avoid; }
+      .success-overlay { display: none !important; }
+      #formBody { display: block !important; }
+      .print-section-title {
+        font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase; color: #8B8FA8; margin-bottom: 12px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .print-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+    }
+    /* скрываем print-val в обычном режиме */
+    .print-val { display: none; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="#">
+    <svg width="59" height="60" viewBox="0 0 59 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_72317_368)">
+<path d="M47.1216 0.0288086C48.0292 0.0290086 48.764 0.763995 48.7642 1.67139V7.53369C48.7642 8.01164 48.9547 8.47045 49.2935 8.80908C49.6302 9.14563 50.0889 9.3374 50.5669 9.3374H56.4282C57.3359 9.33754 58.0716 10.0725 58.0718 10.98V44.2397C58.0717 45.1472 57.3359 45.8822 56.4282 45.8823H51.0854C50.1777 45.8823 49.442 45.1473 49.4419 44.2397V10.4653C49.4419 9.98737 49.2523 9.52858 48.9136 9.18994C48.5787 8.84751 48.1181 8.65185 47.6382 8.64795H41.7788C40.871 8.64795 40.1353 7.91293 40.1353 7.00537V1.67139C40.1354 0.763871 40.8711 0.0288086 41.7788 0.0288086H47.1216ZM53.2788 39.0708C53.1667 39.0708 53.0759 39.1618 53.0757 39.2739V40.021C53.0756 40.0751 53.0538 40.1278 53.0171 40.1665L53.0054 40.1782C52.9667 40.2166 52.9148 40.2377 52.8608 40.2358H52.0962C51.984 40.2359 51.8933 40.3269 51.8931 40.439V44.4546C51.8931 44.5668 51.984 44.6577 52.0962 44.6577H52.772C52.884 44.6575 52.975 44.5667 52.9751 44.4546V41.3647L53.0015 41.3911C53.0401 41.4298 53.062 41.4825 53.0601 41.5366V42.2856C53.0602 42.3977 53.151 42.4887 53.2632 42.4888H53.939C54.0511 42.4887 54.142 42.3977 54.1421 42.2856V41.5405C54.1421 41.4864 54.163 41.4337 54.1997 41.395L54.2271 41.3687V44.4546C54.2271 44.5667 54.3181 44.6575 54.4302 44.6577H55.106C55.2182 44.6577 55.309 44.5668 55.3091 44.4546V40.4331C55.3089 40.321 55.2181 40.23 55.106 40.23H54.3569C54.3086 40.228 54.2638 40.2091 54.2271 40.1763V40.1782L54.2153 40.1665C54.1767 40.1278 54.1558 40.0751 54.1577 40.021V39.2739C54.1575 39.1619 54.0666 39.071 53.9546 39.0708H53.2788ZM54.0298 40.1528C54.084 40.1528 54.1366 40.1747 54.1753 40.2114L54.189 40.2241C54.2276 40.2628 54.2485 40.3155 54.2466 40.3696V41.1919C54.2465 41.2479 54.2217 41.3007 54.1792 41.3394H54.1812C54.1425 41.378 54.0898 41.3989 54.0356 41.397H53.2114C53.1573 41.397 53.1046 41.376 53.0659 41.3394L53.0522 41.3257C53.0136 41.287 52.9927 41.2343 52.9946 41.1802V40.3696C52.9946 40.3155 53.0155 40.2628 53.0522 40.2241L53.0659 40.2114C53.1046 40.1727 53.1572 40.1509 53.2114 40.1528H54.0298ZM53.2808 32.1089C53.1608 32.1089 53.062 32.2077 53.062 32.3276V33.0669C53.062 33.1229 53.0392 33.1757 53.0005 33.2163C52.9599 33.2549 52.9071 33.2759 52.8511 33.2778H52.1118C51.9918 33.2778 51.8931 33.3766 51.8931 33.4966V37.4946C51.8931 37.6145 51.9919 37.7134 52.1118 37.7134H52.7681C52.8879 37.7132 52.9867 37.6144 52.9868 37.4946V33.4253C52.9868 33.3692 53.0097 33.3165 53.0483 33.2759C53.089 33.2372 53.1416 33.2163 53.1978 33.2144H54.0122C54.0683 33.2144 54.121 33.2372 54.1616 33.2759C54.2002 33.3165 54.2212 33.3693 54.2231 33.4253V37.5005C54.2232 37.6203 54.322 37.7191 54.4419 37.7192H55.0981C55.2181 37.7192 55.3168 37.6204 55.3169 37.5005V33.5024C55.3169 33.3825 55.2182 33.2837 55.0981 33.2837H54.3589C54.3028 33.2837 54.2501 33.2599 54.2095 33.2212C54.173 33.1787 54.1539 33.1247 54.1558 33.0688V32.3276C54.1558 32.2077 54.057 32.109 53.937 32.1089H53.2808ZM53.272 25.1597C53.1618 25.1599 53.0728 25.2487 53.0728 25.3589V26.1138C53.0726 26.1676 53.0517 26.2178 53.0151 26.2544L52.9995 26.27C52.9627 26.3087 52.9101 26.3305 52.8579 26.3286H52.0972C51.987 26.3288 51.8979 26.4176 51.8979 26.5278V29.3823C51.8982 29.4923 51.9871 29.5814 52.0972 29.5815H52.8521C52.9062 29.5815 52.9569 29.6025 52.9937 29.6392L53.0093 29.6548C53.0479 29.6915 53.0688 29.7442 53.0669 29.7964V30.5513C53.0672 30.6612 53.1562 30.7502 53.2661 30.7505H53.9497C54.0599 30.7505 54.1486 30.6613 54.1489 30.5513V29.7964C54.1489 29.7422 54.1708 29.6915 54.2075 29.6548L54.2231 29.6392C54.2598 29.6007 54.3117 29.5797 54.3638 29.5815H55.1187C55.2288 29.5815 55.3186 29.4924 55.3188 29.3823V26.5376C55.3188 26.4273 55.229 26.3374 55.1187 26.3374H54.3696C54.3157 26.3373 54.2657 26.3163 54.229 26.2798L54.2134 26.2642C54.1766 26.2255 54.1548 26.1748 54.1567 26.1226L54.1548 26.1206V25.3589C54.1548 25.2486 54.0659 25.1597 53.9556 25.1597H53.272ZM54.0249 26.2524C54.0791 26.2524 54.1297 26.2743 54.1665 26.311L54.1821 26.3267C54.2206 26.3634 54.2416 26.4152 54.2397 26.4673V29.4595C54.2397 29.5136 54.2189 29.5644 54.1821 29.6011L54.1665 29.6157C54.1297 29.6544 54.0771 29.6763 54.0249 29.6743H53.2007C53.1465 29.6743 53.0958 29.6524 53.0591 29.6157L53.0444 29.6011C53.0058 29.5644 52.984 29.5117 52.9858 29.4595V26.4673C52.9859 26.4132 53.0077 26.3634 53.0444 26.3267L53.0591 26.311C53.0958 26.2724 53.1484 26.2505 53.2007 26.2524H54.0249ZM54.3892 18.2993C54.2809 18.2993 54.1951 18.3864 54.1948 18.4927V20.2563C54.1947 20.3084 54.1776 20.3603 54.1411 20.397V20.3931L54.1216 20.4126C54.0848 20.4493 54.0361 20.4692 53.9839 20.4692H53.2212C53.1151 20.469 53.0281 20.3819 53.0278 20.2759V18.4946C53.0276 18.3884 52.9408 18.3013 52.8345 18.3013H52.1372C52.0311 18.3015 51.9441 18.3885 51.9438 18.4946V23.6099C51.9439 23.7161 52.031 23.803 52.1372 23.8032H52.8345C52.9409 23.8032 53.0278 23.7162 53.0278 23.6099V21.7446C53.0278 21.6383 53.1149 21.5515 53.2212 21.5513H53.9858C54.0381 21.5513 54.0868 21.5721 54.1235 21.6069L54.1431 21.6265C54.1797 21.6632 54.1987 21.712 54.1987 21.7642V23.6099C54.1988 23.7162 54.2867 23.8032 54.3931 23.8032H55.0894C55.1977 23.8032 55.2826 23.7162 55.2827 23.6099V21.8296C55.2827 21.7232 55.1958 21.6362 55.0894 21.6362H54.3228C54.2707 21.6361 54.2227 21.6143 54.186 21.5796L54.1665 21.5601C54.1299 21.5234 54.11 21.4754 54.1099 21.4233V20.5952C54.1099 20.543 54.1317 20.4943 54.1665 20.4575L54.186 20.438C54.2227 20.4015 54.2707 20.3824 54.3228 20.3823H55.0854C55.1938 20.3823 55.2787 20.2944 55.2788 20.188V18.4927C55.2786 18.3864 55.1918 18.2993 55.0854 18.2993H54.3892ZM50.9438 11.4233C50.8238 11.4234 50.7251 11.5221 50.7251 11.6421V15.563C50.7253 15.6828 50.824 15.7817 50.9438 15.7817H51.6851C51.7412 15.7817 51.7938 15.8046 51.8345 15.8433C51.8731 15.8839 51.8941 15.9366 51.896 15.9927V16.7339C51.8963 16.8536 51.995 16.9525 52.1147 16.9526H52.7808C52.9006 16.9526 52.9992 16.8537 52.9995 16.7339V15.9927C52.9995 15.9367 53.0225 15.8839 53.061 15.8433C53.1017 15.8046 53.1544 15.7837 53.2104 15.7817H54.0278C54.0837 15.7819 54.1357 15.8047 54.1763 15.8433C54.2149 15.8839 54.2368 15.9366 54.2388 15.9927V16.7339C54.239 16.8536 54.3377 16.9526 54.4575 16.9526H55.1226C55.2424 16.9526 55.341 16.8537 55.3413 16.7339V15.9927C55.3413 15.9366 55.3651 15.8839 55.4038 15.8433C55.4443 15.8047 55.4964 15.7838 55.5522 15.7817H56.2944C56.4141 15.7815 56.513 15.6827 56.5132 15.563V11.6421C56.5132 11.5222 56.4143 11.4235 56.2944 11.4233H55.6284C55.5084 11.4234 55.4097 11.5221 55.4097 11.6421V15.6362C55.4096 15.6923 55.3878 15.745 55.3511 15.7856H55.3472C55.3066 15.824 55.2546 15.8452 55.1987 15.8472H54.3813C54.3255 15.8471 54.2734 15.824 54.2329 15.7856C54.1942 15.745 54.1724 15.6923 54.1704 15.6362V11.6421C54.1704 11.5221 54.0717 11.4233 53.9517 11.4233H53.2856C53.1658 11.4236 53.0669 11.5222 53.0669 11.6421V15.6362C53.0669 15.6923 53.0441 15.745 53.0054 15.7856C52.9648 15.8242 52.912 15.8452 52.856 15.8472H52.0396C51.9835 15.8472 51.9308 15.8243 51.8901 15.7856C51.8515 15.745 51.8306 15.6923 51.8286 15.6362V11.6421C51.8286 11.5221 51.7298 11.4234 51.6099 11.4233H50.9438Z" fill="#070B19"/>
+<path d="M9.15818 27.8053C9.49692 27.4685 9.95375 27.2808 10.4299 27.2808H24.9282C25.8321 27.2808 26.5657 26.5473 26.5657 25.6436V19.7662C26.5657 19.2921 26.7554 18.8373 27.0903 18.5025C27.4291 18.1657 27.8859 17.978 28.362 17.978H34.231C35.135 17.978 35.8686 17.2446 35.8686 16.3408V10.9705C35.8686 10.0667 35.135 9.33323 34.231 9.33323H28.3756C27.3807 9.33323 26.5715 8.52623 26.5715 7.52957V1.65993C26.5715 0.756169 25.8379 0.0227051 24.934 0.0227051H1.66518C0.745731 0.0227051 0.00242585 0.767778 0.00242585 1.68509V6.98576C0.00242585 7.90501 0.747667 8.64815 1.66518 8.64815H25.445C26.4419 8.64815 27.251 9.45515 27.2529 10.4537V16.8323C27.2529 17.3104 27.0632 17.7671 26.7245 18.1038C26.3857 18.4405 25.9289 18.6283 25.4527 18.6283H10.9487C10.0447 18.6283 9.31111 19.3617 9.31111 20.2655V26.139C9.31111 26.6151 9.12334 27.0699 8.78653 27.4066C8.44973 27.7433 7.99484 27.931 7.51867 27.931H1.63808C0.734115 27.931 0.000488281 28.6645 0.000488281 29.5683V34.9231C0.000488281 35.8269 0.734115 36.5604 1.63808 36.5604H7.51093C7.98711 36.5604 8.44199 36.7481 8.7788 37.0848C9.1156 37.4215 9.30336 37.8763 9.30336 38.3524V44.224C9.30336 45.1277 10.037 45.8612 10.9409 45.8612H34.2194C35.1389 45.8612 35.8822 45.1161 35.8822 44.1988V38.9175C35.8822 37.9982 35.1369 37.2551 34.2194 37.2551H10.4377C9.9615 37.2551 9.50467 37.0674 9.16593 36.7307C8.83106 36.3959 8.64136 35.9411 8.64136 35.4669V29.0709C8.63749 28.5968 8.82525 28.1401 9.16012 27.8033L9.15818 27.8053Z" fill="#070B19"/>
+</g>
+<g clip-path="url(#clip1_72317_368)">
+<path d="M51.3908 53.208L52.5813 52.3314H48.5957V57.6011H52.5813V56.7225H49.7339V55.3736H52.1631V54.4969H49.7339V53.208H51.3908Z" fill="#070B19"/>
+<path d="M45.5896 54.3847H44.2056V53.208H46.4142L47.6046 52.3314H43.0674V57.6011H45.4425C46.7742 57.6011 47.5388 56.9973 47.5388 55.9464C47.5388 54.8956 46.8458 54.3866 45.5896 54.3866V54.3847ZM45.3921 56.7225H44.2056V55.2614H45.3921C46.1142 55.2614 46.451 55.5052 46.451 55.9909C46.451 56.4767 46.0948 56.7205 45.3921 56.7205V56.7225Z" fill="#070B19"/>
+<path d="M55.81 52.3314H53.6401V57.6011H54.7763V56.109H55.8081C57.1921 56.109 58.0534 55.3813 58.0534 54.2182C58.0534 53.0552 57.194 52.3333 55.8081 52.3333L55.81 52.3314ZM55.7848 55.2304H54.7763V53.208H55.7848C56.5126 53.208 56.9153 53.568 56.9153 54.2182C56.9153 54.8685 56.5146 55.2284 55.7848 55.2284V55.2304Z" fill="#070B19"/>
+<path d="M41.1162 56.4593C40.824 56.6199 40.4852 56.7051 40.1349 56.7051C39.109 56.7051 38.3657 55.9735 38.3657 54.9653C38.3657 53.957 39.109 53.2255 40.1349 53.2255C40.522 53.2255 40.8704 53.3338 41.1685 53.5487L41.9834 52.9468L41.9292 52.9004C41.4531 52.4823 40.8162 52.2617 40.0884 52.2617C39.2986 52.2617 38.5824 52.5268 38.0714 53.0107C37.5565 53.4964 37.2739 54.1796 37.2739 54.9362C37.2739 55.6929 37.5565 56.3896 38.0695 56.8909C38.5844 57.394 39.2986 57.6708 40.0826 57.6708C40.8665 57.6708 41.6176 57.3843 42.1034 56.8657C41.7299 56.5889 41.3679 56.3238 41.3679 56.3238L41.1162 56.4612V56.4593Z" fill="#070B19"/>
+<path d="M34.6418 54.965C34.6418 54.6979 34.6185 54.4347 34.5721 54.1812L33.6294 54.8759C33.6294 54.905 33.6294 54.9359 33.6294 54.965C33.6294 56.8209 32.1196 58.3323 30.2613 58.3323C28.4031 58.3323 26.8932 56.8228 26.8932 54.965C26.8932 53.1071 28.4031 51.5976 30.2613 51.5976C30.9659 51.5976 31.6182 51.8144 32.1602 52.1859L33.0119 51.5589C32.2609 50.9512 31.3027 50.5874 30.2613 50.5874C27.8437 50.5874 25.8828 52.5478 25.8828 54.965C25.8828 57.3821 27.8437 59.3425 30.2613 59.3425C32.679 59.3425 34.6398 57.3821 34.6398 54.965H34.6418Z" fill="#070B19"/>
+<path d="M33.7281 52.2885C33.9352 52.5556 34.1114 52.8478 34.2527 53.1594L30.2632 56.099L28.5966 55.054V53.7961L30.2632 54.8411L33.7281 52.2885Z" fill="#070B19"/>
+</g>
+<defs>
+<clipPath id="clip0_72317_368">
+<rect width="58.2353" height="45.8824" fill="white"/>
+</clipPath>
+<clipPath id="clip1_72317_368">
+<rect width="32.3529" height="9.41177" fill="white" transform="translate(25.8823 50.5884)"/>
+</clipPath>
+</defs>
+</svg>
+  </a>
+</header>
+
+<div class="page">
+  <div class="card">
+
+    <!-- Card head -->
+    <div class="card-head">
+      <div class="card-head-tag">Graphic Asset Request</div>
+      <h1>Форма заявки на создание<br>графического объекта</h1>
+      <div class="print-date" id="printDate"></div>
+    </div>
+
+    <form id="form" novalidate>
+    <div class="card-body" id="formBody">
+
+      <!-- Jira banner -->
+      <div class="jira-banner">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-top:1px">
+          <circle cx="10" cy="10" r="10" fill="#2D5FE3"/>
+          <text x="10" y="14.5" text-anchor="middle" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="white">i</text>
+        </svg>
+        <span><strong>Как использовать:</strong> заполните форму, нажмите «Сформировать заявку» — HTML-файл скачается автоматически. Прикрепите его к&nbsp;заявке в&nbsp;Jira.</span>
+      </div>
+
+      <!-- 1. Общая информация -->
+      <div class="section">
+        <div class="section-label">1 — Общая информация</div>
+
+        <div class="field">
+          <label class="field-label">Тип объекта <span class="req">*</span></label>
+          <div class="pill-group">
+            <label class="pill pill-green">
+              <input type="radio" name="type" value="achivka" required>
+              <span>Ачивка</span>
+            </label>
+            <label class="pill pill-green">
+              <input type="radio" name="type" value="gerb">
+              <span>Герб трайба</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="campusSelect">Кампус <span class="req">*</span></label>
+            <select id="campusSelect" name="campusSelect">
+              <option value="">— Выберите кампус —</option>
+              <option value="Москва">Москва</option>
+              <option value="Санкт-Петербург">Санкт-Петербург</option>
+              <option value="Казань">Казань</option>
+              <option value="other">Другой…</option>
+            </select>
+            <input type="text" id="campusOther" name="campusOther" placeholder="Укажите кампус" style="margin-top:8px;display:none">
+          </div>
+          <div class="field">
+            <label class="field-label" for="deadline">Дедлайн <span class="req">*</span></label>
+            <input type="date" id="deadline" name="deadline" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reqTitle">Название заявки <span class="req">*</span></label>
+          <input type="text" id="reqTitle" name="reqTitle" placeholder="Например: Iron Will, Герб Neurons" required>
+          <div class="hint">Iron Will · Герб Neurons · Ачивки для интенсива BA · Беговой марафон</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="context">Контекст создания</label>
+          <textarea id="context" name="context" placeholder="Опишите контекст…"></textarea>
+          <div class="hint">Турнир трайбов · Новый поток обучения · День рождения школы · Юбилейный релиз</div>
+        </div>
+      </div>
+
+      <!-- 2. Ачивки -->
+      <div class="section cond" id="secAch">
+        <div class="section-label">2 — Для ачивок</div>
+
+        <div class="field">
+          <label class="field-label">Содержит несколько ачивок?</label>
+          <div class="pill-group">
+            <label class="pill">
+              <input type="radio" name="multi" value="no">
+              <span>Нет — одна ачивка</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="multi" value="yes">
+              <span>Да — несколько</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Одна ачивка -->
+        <div class="cond" id="single">
+          <hr>
+          <div class="field">
+            <label class="field-label" for="aName">Название ачивки <span class="req">*</span></label>
+            <input type="text" id="aName" name="aName" placeholder="Введите название">
+          </div>
+          <div class="field">
+            <label class="field-label" for="aReason">За что выдается? <span class="req">*</span></label>
+            <textarea id="aReason" name="aReason" placeholder="Опишите условие получения ачивки"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label" for="aSymbols">Символы / ассоциации / идеи <span class="req">*</span></label>
+            <textarea id="aSymbols" name="aSymbols" placeholder="Например: нейрон, мозг, кубок, кроссовки…"></textarea>
+            <div class="hint">Нейрон · Мозг · Утка · Сердце · Диаграмма · Компас · Кубок · Кроссовки</div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="aExtra">Дополнительные элементы</label>
+              <textarea id="aExtra" name="aExtra" placeholder="Цифра 1, звёзды, монеты…" style="min-height:72px"></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label" for="aColors">Цветовые пожелания</label>
+              <textarea id="aColors" name="aColors" placeholder="Например: синий и золотой" style="min-height:72px"></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="aRefs">Референсы</label>
+            <div class="upload-wrap">
+              <textarea id="aRefs" name="aRefs" placeholder="Ссылки или описание" style="min-height:56px"></textarea>
+              <div class="upload-drop" id="aRefsDrop">
+                <input type="file" id="aRefsFiles" accept="image/*" multiple>
+                <span class="upload-drop-icon">🖼</span>
+                <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
+              </div>
+              <div class="upload-previews" id="aRefsPreviews"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="aLimits">Ограничения</label>
+            <textarea id="aLimits" name="aLimits" placeholder="Без текста, PNG без фона…" style="min-height:72px"></textarea>
+          </div>
+        </div>
+
+        <!-- Несколько ачивок -->
+        <div class="cond" id="multi">
+          <hr>
+          <div class="field">
+            <label class="field-label">Ачивки объединены одной темой?</label>
+            <div class="pill-group">
+              <label class="pill pill-green">
+                <input type="radio" name="theme" value="yes">
+                <span>Да</span>
+              </label>
+              <label class="pill pill-green">
+                <input type="radio" name="theme" value="no">
+                <span>Нет</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cond" id="themeBlock">
+            <div class="field">
+              <label class="field-label" for="serTheme">Тема серии <span class="req">*</span></label>
+              <input type="text" id="serTheme" name="serTheme" placeholder="Бег, Космос, Новый год, Олимпиада…">
+            </div>
+            <div class="field">
+              <label class="field-label" for="serNotes">Общие пожелания к серии</label>
+              <textarea id="serNotes" name="serNotes" placeholder="Все ачивки должны выглядеть как единая серия…"></textarea>
+            </div>
+          </div>
+
+          <hr>
+          <div class="field">
+            <label class="field-label">Карточки ачивок</label>
+          </div>
+          <div id="cards"></div>
+          <button type="button" class="btn-add-card" id="btnAdd">+ Добавить ачивку</button>
+        </div>
+      </div>
+
+      <!-- 3. Герб трайба -->
+      <div class="section cond" id="secGerb">
+        <div class="section-label">3 — Для герба трайба</div>
+
+        <div class="field">
+          <label class="field-label" for="tribeName">Название трайба <span class="req">*</span></label>
+          <input type="text" id="tribeName" name="tribeName" placeholder="Введите название трайба">
+        </div>
+        <div class="field">
+          <label class="field-label" for="gSymbolize">Что символизирует герб? <span class="req">*</span></label>
+          <textarea id="gSymbolize" name="gSymbolize" placeholder="Опишите символику герба"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="tribeWork">Чем занимается трайб? <span class="req">*</span></label>
+          <textarea id="tribeWork" name="tribeWork" placeholder="Опишите деятельность трайба"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="gSymbols">Символы / ассоциации / идеи <span class="req">*</span></label>
+          <textarea id="gSymbols" name="gSymbols" placeholder="Нейрон, шестеренка, стрелка вверх, компас…"></textarea>
+          <div class="hint">Нейрон · Мозг · Диаграмма · Стрелка вверх · Компас · Шестеренка</div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="gColors">Цветовые пожелания</label>
+          <textarea id="gColors" name="gColors" placeholder="Например: тёмно-синий с золотом"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="gRefs">Референсы</label>
+          <div class="upload-wrap">
+            <textarea id="gRefs" name="gRefs" placeholder="Ссылки или описание референсов" style="min-height:56px"></textarea>
+            <div class="upload-drop" id="gRefsDrop">
+              <input type="file" id="gRefsFiles" accept="image/*" multiple>
+              <span class="upload-drop-icon">🖼</span>
+              <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
+            </div>
+            <div class="upload-previews" id="gRefsPreviews"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="gLimits">Ограничения</label>
+          <textarea id="gLimits" name="gLimits" placeholder="Что нельзя использовать?"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Предпочтительный стиль</label>
+          <div class="pill-group">
+            <label class="pill">
+              <input type="radio" name="gStyle" value="pixel">
+              <span>Пиксельный</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="gStyle" value="nopixel">
+              <span>Непиксельный</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="gStyle" value="any">
+              <span>Без предпочтений</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /formBody -->
+
+    <!-- Success state -->
+    <div class="success-overlay" id="success">
+      <div class="success-icon">✓</div>
+      <h2>Файл сформирован!</h2>
+      <p>HTML-файл скачан на ваше устройство.<br>Прикрепите его к заявке в <strong>Jira</strong> и отправьте в работу.</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-foot" id="foot">
+      <hr class="foot-divider">
+      <p class="foot-note">Не&nbsp;обязательно описывать готовый дизайн. Достаточно объяснить смысл объекта и&nbsp;указать символы или&nbsp;ассоциации, которые приходят вам&nbsp;в&nbsp;голову. Визуальную реализацию дизайнер предложит самостоятельно.</p>
+      <button type="submit" class="btn-submit">Сформировать заявку</button>
+    </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  let cardIdx = 0;
+
+  const on  = el => el?.classList.add('on');
+  const off = el => el?.classList.remove('on');
+
+  // Type toggle
+  document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'achivka') { on(document.getElementById('secAch')); off(document.getElementById('secGerb')); }
+    else { off(document.getElementById('secAch')); on(document.getElementById('secGerb')); }
+  }));
+
+  // Multiple toggle
+  document.querySelectorAll('input[name="multi"]').forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'no') { on(document.getElementById('single')); off(document.getElementById('multi')); }
+    else { off(document.getElementById('single')); on(document.getElementById('multi')); }
+  }));
+
+  // Theme toggle
+  document.querySelectorAll('input[name="theme"]').forEach(r => r.addEventListener('change', () => {
+    r.value === 'yes' ? on(document.getElementById('themeBlock')) : off(document.getElementById('themeBlock'));
+  }));
+
+  // Add achievement card
+  document.getElementById('btnAdd').addEventListener('click', () => {
+    cardIdx++;
+    const n = cardIdx;
+    const div = document.createElement('div');
+    div.className = 'ach-card';
+    div.innerHTML = `
+      <div class="ach-card-head">
+        <span class="ach-num">Ачивка ${n}</span>
+        <button type="button" class="btn-del" onclick="this.closest('.ach-card').remove();renumber()">✕</button>
+      </div>
+      <div class="field">
+        <label class="field-label">Название ачивки <span class="req">*</span></label>
+        <input type="text" name="cn_${n}" placeholder="Введите название">
+      </div>
+      <div class="field">
+        <label class="field-label">За что выдается? <span class="req">*</span></label>
+        <textarea name="cr_${n}" placeholder="Опишите условие получения"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Символы / ассоциации / идеи <span class="req">*</span></label>
+        <textarea name="cs_${n}" placeholder="Например: нейрон, мозг, кубок…"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Доп. элементы</label>
+          <textarea name="ce_${n}" style="min-height:64px" placeholder="Цифра 1, звёзды…"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label">Цветовые пожелания</label>
+          <textarea name="cc_${n}" style="min-height:64px" placeholder="Синий и золотой…"></textarea>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="field-label">Доп. пожелания</label>
+        <textarea name="cd_${n}" placeholder="Любые пожелания…"></textarea>
+      </div>
+    `;
+    document.getElementById('cards').appendChild(div);
+  });
+
+  function renumber() {
+    document.querySelectorAll('.ach-card .ach-num').forEach((el, i) => el.textContent = `Ачивка ${i + 1}`);
+  }
+
+  // ── Upload helpers ──
+  const uploadStores = { aRefs: [], gRefs: [] };
+
+  function initUpload(inputId, dropId, previewsId, storeKey) {
+    const input    = document.getElementById(inputId);
+    const drop     = document.getElementById(dropId);
+    const previews = document.getElementById(previewsId);
+
+    function addFiles(files) {
+      [...files].forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          const dataUrl = e.target.result;
+          uploadStores[storeKey].push(dataUrl);
+          const idx = uploadStores[storeKey].length - 1;
+
+          const thumb = document.createElement('div');
+          thumb.className = 'upload-thumb';
+          thumb.innerHTML = `<img src="${dataUrl}" alt=""><button type="button" class="upload-thumb-del" data-idx="${idx}">✕</button>`;
+          thumb.querySelector('.upload-thumb-del').addEventListener('click', () => {
+            uploadStores[storeKey][idx] = null;
+            thumb.remove();
+          });
+          previews.appendChild(thumb);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    input.addEventListener('change', () => addFiles(input.files));
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+    drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+  }
+
+  initUpload('aRefsFiles', 'aRefsDrop', 'aRefsPreviews', 'aRefs');
+  initUpload('gRefsFiles', 'gRefsDrop', 'gRefsPreviews', 'gRefs');
+
+  // ── Campus other ──
+  document.getElementById('campusSelect').addEventListener('change', function() {
+    const other = document.getElementById('campusOther');
+    other.style.display = this.value === 'other' ? 'block' : 'none';
+    if (this.value === 'other') other.focus();
+  });
+
+
+  // Submit → генерация HTML-файла
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const typeEl  = document.querySelector('input[name="type"]:checked');
+    const campusSelect = document.getElementById('campusSelect').value;
+    const campus = campusSelect === 'other'
+      ? document.getElementById('campusOther').value.trim()
+      : campusSelect;
+    const title   = document.getElementById('reqTitle').value.trim();
+    const deadline = document.getElementById('deadline').value;
+    const missing = [];
+    if (!typeEl)   missing.push('Тип объекта');
+    if (!campus)   missing.push('Кампус');
+    if (!title)    missing.push('Название заявки');
+    if (!deadline) missing.push('Дедлайн');
+    if (missing.length) { alert('Заполните обязательные поля:\n• ' + missing.join('\n• ')); return; }
+
+    downloadHTML(typeEl.value, campus, title, deadline);
+
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('foot').style.display = 'none';
+    document.querySelector('.jira-banner').style.display = 'none';
+    on(document.getElementById('success'));
+  });
+
+  function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function rv(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+
+  function esc(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function field(label, value, optional) {
+    if (optional && !value) return '';
+    return `
+      <div class="field">
+        <div class="label">${esc(label)}</div>
+        <div class="value">${value ? esc(value) : '<span class="empty">—</span>'}</div>
+      </div>`;
+  }
+
+  function imagesBlock(store) {
+    const imgs = store.filter(Boolean);
+    if (!imgs.length) return '';
+    return `<div class="images">${imgs.map(src => `<img src="${src}">`).join('')}</div>`;
+  }
+
+  function section(num, title, content) {
+    return `<div class="section"><div class="section-title">${num} — ${esc(title)}</div>${content}</div>`;
+  }
+
+  function downloadHTML(type, campus, title, deadline) {
+    let deadlineFmt = deadline;
+    if (deadline) { const [y,m,d] = deadline.split('-'); deadlineFmt = `${d}.${m}.${y}`; }
+
+    const typeLabel = type === 'achivka' ? 'Ачивка' : 'Герб трайба';
+    const dateStr = new Date().toLocaleDateString('ru-RU');
+
+    // Секция 1
+    let body = section('1', 'Общая информация',
+      field('Тип объекта', typeLabel) +
+      field('Кампус', campus) +
+      field('Название заявки', title) +
+      field('Дедлайн', deadlineFmt) +
+      field('Контекст создания', v('context'), true)
+    );
+
+    // Секция 2 — Ачивки
+    if (type === 'achivka') {
+      const multi = rv('multi');
+      let achContent = '';
+
+      if (multi === 'no') {
+        achContent =
+          field('Название ачивки', v('aName')) +
+          field('За что выдается?', v('aReason')) +
+          field('Символы / ассоциации / идеи', v('aSymbols')) +
+          field('Дополнительные элементы', v('aExtra'), true) +
+          field('Цветовые пожелания', v('aColors'), true) +
+          field('Референсы', v('aRefs'), true) +
+          imagesBlock(uploadStores['aRefs']) +
+          field('Ограничения', v('aLimits'), true);
+
+      } else if (multi === 'yes') {
+        const unified = rv('unifiedTheme');
+        achContent += field('Объединены одной темой', unified === 'yes' ? 'Да' : 'Нет');
+        if (unified === 'yes') {
+          achContent += field('Тема серии', v('serTheme')) + field('Общие пожелания к серии', v('serNotes'), true);
+        }
+        document.querySelectorAll('.ach-card').forEach((card, i) => {
+          const labels = card.querySelectorAll('.field-label');
+          const inputs = card.querySelectorAll('input[type="text"], textarea');
+          let cardContent = '';
+          labels.forEach((lbl, idx) => {
+            const inp = inputs[idx];
+            if (inp) cardContent += field(lbl.textContent.replace('*','').trim(), inp.value.trim(), idx > 2);
+          });
+          achContent += `<div class="ach-card"><div class="ach-title">Ачивка ${i+1}</div>${cardContent}</div>`;
+        });
+      }
+
+      body += section('2', 'Для ачивок', achContent);
+    }
+
+    // Секция 3 — Герб
+    if (type === 'gerb') {
+      const styleMap = { pixel: 'Пиксельный', nopixel: 'Непиксельный', any: 'Без предпочтений' };
+      body += section('3', 'Для герба трайба',
+        field('Название трайба', v('tribeName')) +
+        field('Что символизирует герб?', v('gSymbolize')) +
+        field('Чем занимается трайб?', v('tribeWork')) +
+        field('Символы / ассоциации / идеи', v('gSymbols')) +
+        field('Цветовые пожелания', v('gColors'), true) +
+        field('Референсы', v('gRefs'), true) +
+        imagesBlock(uploadStores['gRefs']) +
+        field('Ограничения', v('gLimits'), true) +
+        field('Предпочтительный стиль', styleMap[rv('gStyle')] || '', true)
+      );
+    }
+
+    const html = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Заявка — ${esc(title)}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#F4F4F9;color:#111318;padding:32px 16px 64px}
+  .wrap{max-width:720px;margin:0 auto}
+  .head{background:#070B19;border-radius:16px 16px 0 0;padding:32px 40px}
+  .head-tag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#21BA72;margin-bottom:8px}
+  .head h1{font-size:22px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:8px}
+  .head-date{font-size:12px;color:rgba(255,255,255,.4)}
+  .card{background:#fff;border-radius:0 0 16px 16px;overflow:hidden}
+  .section{padding:28px 40px;border-top:1px solid #E8E8F0}
+  .section-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8B8FA8;margin-bottom:20px}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .label{font-size:13px;font-weight:600;margin-bottom:6px}
+  .value{background:#F4F4F9;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  .empty{color:#aaa;font-style:italic}
+  .ach-card{background:#F4F4F9;border-radius:10px;padding:16px;margin-top:16px}
+  .ach-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8B8FA8;margin-bottom:14px}
+  .ach-card .value{background:#fff}
+  .images{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .images img{width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #E8E8F0}
+  .foot{text-align:center;margin-top:20px;font-size:11px;color:#aaa}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="head-tag">Graphic Asset Request</div>
+    <h1>Форма заявки на создание<br>графического объекта</h1>
+    <div class="head-date">Сформировано: ${dateStr}</div>
+  </div>
+  <div class="card">${body}</div>
+  <div class="foot">Школа 21 · Graphic Asset Request</div>
+</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const safeName = title.replace(/[^а-яёА-ЯЁa-zA-Z0-9\s]/g,'').trim().replace(/\s+/g,'_');
+    a.download = `Заявка_${safeName || 'graphic_asset'}.html`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+</script>
+</body>
+</html>
