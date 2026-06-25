@@ -105,9 +105,8 @@
     /* ── Section ── */
     .section {
       padding: 36px 48px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: none !important;
     }
-    .section:last-of-type { border-bottom: none; }
 
     .section-label {
       font-size: 10px;
@@ -147,8 +146,27 @@
     label.field-label .req { color: var(--red); margin-left: 2px; }
     label.field-label .opt { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 4px; }
 
+    /* ── multi-count label ── */
+    .multi-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+    .multi-label label.field-label { margin-bottom: 0; }
+    .multi-count-link {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .multi-count-link:hover { color: var(--green); text-decoration: underline; }
+
     input[type="text"],
     input[type="date"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -177,7 +195,6 @@
       background: #EBEBF3;
       box-shadow: none;
     }
-    /* внутри карточки ачивки — белые поля */
     .ach-card input, .ach-card textarea, .ach-card select {
       background: #fff;
     }
@@ -224,7 +241,6 @@
     /* ── Divider ── */
     hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-
     /* ── Upload ── */
     .upload-wrap { display: flex; flex-direction: column; gap: 8px; }
     .upload-drop {
@@ -246,6 +262,7 @@
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
       border: none; background: none; padding: 0;
     }
+    .ach-card .upload-drop { background: #fff; }
     .upload-drop-icon { font-size: 18px; flex-shrink: 0; }
     .upload-drop-text { font-size: 13px; color: var(--muted); }
     .upload-drop-text strong { color: var(--text); font-weight: 600; }
@@ -323,19 +340,15 @@
     }
 
     /* ── Footer ── */
-    /* все секции без border-bottom — разделитель рисует card-foot */
-    .section {
-      border-bottom: none !important;
-    }
     .card-foot {
       padding: 24px 48px 36px;
       background: #fff;
-      border-top: 1px solid var(--border);
+      border-top: none;
       display: flex;
       flex-direction: column;
       gap: 0;
     }
-    .foot-divider { display: none; }
+    .foot-divider { display: block; border: none; border-top: 1px solid var(--border); margin: 0 0 36px; }
     .foot-note {
       font-size: 12px;
       color: var(--muted);
@@ -363,6 +376,24 @@
       box-shadow: 0 8px 28px rgba(27,211,139,0.45);
     }
     .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit-wrap { position: relative; }
+    .btn-submit-wrap[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 7px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+    }
 
     /* ── Jira banner ── */
     .jira-banner {
@@ -378,7 +409,6 @@
       line-height: 1.5;
       border: none;
     }
-    /* баннер внутри formBody — добавляем отступ снизу, без разделителей */
     #formBody > .jira-banner {
       margin: 24px 48px 0;
     }
@@ -418,7 +448,12 @@
       .field-row { grid-template-columns: 1fr; }
       .card-foot { flex-direction: column; align-items: stretch; }
       .btn-submit { text-align: center; }
+      .jira-banner { margin-left: 24px; margin-right: 24px; }
+      #formBody > .jira-banner { margin-left: 24px; margin-right: 24px; }
     }
+
+    /* скрываем print-val в обычном режиме */
+    .print-val { display: none; }
 
     /* ── Print styles ── */
     @media print {
@@ -454,15 +489,8 @@
       .ach-card { background: #F4F4F9; border-radius: 10px; padding: 12px; margin-bottom: 10px; page-break-inside: avoid; }
       .success-overlay { display: none !important; }
       #formBody { display: block !important; }
-      .print-section-title {
-        font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-        text-transform: uppercase; color: #8B8FA8; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 8px;
-      }
       .print-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 6px; }
     }
-    /* скрываем print-val в обычном режиме */
-    .print-val { display: none; }
   </style>
 </head>
 <body>
@@ -521,6 +549,18 @@
         <div class="section-label">1 — Общая информация</div>
 
         <div class="field">
+          <label class="field-label" for="campusSelect">Кампус <span class="req">*</span></label>
+          <select id="campusSelect" name="campusSelect">
+            <option value="">— Выберите кампус —</option>
+            <option value="Москва">Москва</option>
+            <option value="Санкт-Петербург">Санкт-Петербург</option>
+            <option value="Казань">Казань</option>
+            <option value="other">Другой…</option>
+          </select>
+          <input type="text" id="campusOther" name="campusOther" placeholder="Укажите кампус" style="margin-top:8px;display:none">
+        </div>
+
+        <div class="field">
           <label class="field-label">Тип объекта <span class="req">*</span></label>
           <div class="pill-group">
             <label class="pill pill-green">
@@ -531,38 +571,18 @@
               <input type="radio" name="type" value="gerb">
               <span>Герб трайба</span>
             </label>
+            <label class="pill pill-green">
+              <input type="radio" name="type" value="image">
+              <span>Другое</span>
+            </label>
           </div>
         </div>
 
-        <div class="field-row">
-          <div class="field">
-            <label class="field-label" for="campusSelect">Кампус <span class="req">*</span></label>
-            <select id="campusSelect" name="campusSelect">
-              <option value="">— Выберите кампус —</option>
-              <option value="Москва">Москва</option>
-              <option value="Санкт-Петербург">Санкт-Петербург</option>
-              <option value="Казань">Казань</option>
-              <option value="other">Другой…</option>
-            </select>
-            <input type="text" id="campusOther" name="campusOther" placeholder="Укажите кампус" style="margin-top:8px;display:none">
-          </div>
-          <div class="field">
-            <label class="field-label" for="deadline">Дедлайн <span class="req">*</span></label>
-            <input type="date" id="deadline" name="deadline" required>
-          </div>
+        <div class="field cond" id="deadlineField">
+          <label class="field-label" for="globalDeadline">Дедлайн <span class="req">*</span></label>
+          <input type="date" id="globalDeadline" name="globalDeadline">
         </div>
 
-        <div class="field">
-          <label class="field-label" for="reqTitle">Название заявки <span class="req">*</span></label>
-          <input type="text" id="reqTitle" name="reqTitle" placeholder="Например: Iron Will, Герб Neurons" required>
-          <div class="hint">Iron Will · Герб Neurons · Ачивки для интенсива BA · Беговой марафон</div>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="context">Контекст создания</label>
-          <textarea id="context" name="context" placeholder="Опишите контекст…"></textarea>
-          <div class="hint">Турнир трайбов · Новый поток обучения · День рождения школы · Юбилейный релиз</div>
-        </div>
       </div>
 
       <!-- 2. Ачивки -->
@@ -570,7 +590,9 @@
         <div class="section-label">2 — Для ачивок</div>
 
         <div class="field">
-          <label class="field-label">Содержит несколько ачивок?</label>
+          <div class="multi-label">
+            <label class="field-label">Содержит несколько ачивок?</label>
+          </div>
           <div class="pill-group">
             <label class="pill">
               <input type="radio" name="multi" value="no">
@@ -596,29 +618,24 @@
           </div>
           <div class="field">
             <label class="field-label" for="aSymbols">Символы / ассоциации / идеи <span class="req">*</span></label>
-            <textarea id="aSymbols" name="aSymbols" placeholder="Например: нейрон, мозг, кубок, кроссовки…"></textarea>
-            <div class="hint">Нейрон · Мозг · Утка · Сердце · Диаграмма · Компас · Кубок · Кроссовки</div>
+            <div class="upload-wrap">
+              <textarea id="aSymbols" name="aSymbols" placeholder="Например: нейрон, мозг, кубок, кроссовки…"></textarea>
+              <div class="upload-drop" id="aSymbolsDrop">
+                <input type="file" id="aSymbolsFiles" accept="image/*" multiple>
+                <span class="upload-drop-icon">🖼</span>
+                <span class="upload-drop-text"><strong>Добавить рефы</strong> — перетащите или нажмите</span>
+              </div>
+              <div class="upload-previews" id="aSymbolsPreviews"></div>
+            </div>
           </div>
           <div class="field-row">
             <div class="field">
               <label class="field-label" for="aExtra">Дополнительные элементы</label>
-              <textarea id="aExtra" name="aExtra" placeholder="Цифра 1, звёзды, монеты…" style="min-height:72px"></textarea>
+              <textarea id="aExtra" name="aExtra" placeholder="Введите пожелания по метафорам и элементам" style="min-height:72px"></textarea>
             </div>
             <div class="field">
               <label class="field-label" for="aColors">Цветовые пожелания</label>
-              <textarea id="aColors" name="aColors" placeholder="Например: синий и золотой" style="min-height:72px"></textarea>
-            </div>
-          </div>
-          <div class="field">
-            <label class="field-label" for="aRefs">Референсы</label>
-            <div class="upload-wrap">
-              <textarea id="aRefs" name="aRefs" placeholder="Ссылки или описание" style="min-height:56px"></textarea>
-              <div class="upload-drop" id="aRefsDrop">
-                <input type="file" id="aRefsFiles" accept="image/*" multiple>
-                <span class="upload-drop-icon">🖼</span>
-                <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
-              </div>
-              <div class="upload-previews" id="aRefsPreviews"></div>
+              <textarea id="aColors" name="aColors" placeholder="Введите пожелания по цветам" style="min-height:72px"></textarea>
             </div>
           </div>
           <div class="field">
@@ -659,8 +676,8 @@
           <div class="field">
             <label class="field-label">Карточки ачивок</label>
           </div>
-          <div id="cards"></div>
-          <button type="button" class="btn-add-card" id="btnAdd">+ Добавить ачивку</button>
+          <div id="achCards"></div>
+          <button type="button" class="btn-add-card" id="btnAddAch">+ Добавить ачивку</button>
         </div>
       </div>
 
@@ -669,58 +686,188 @@
         <div class="section-label">3 — Для герба трайба</div>
 
         <div class="field">
-          <label class="field-label" for="tribeName">Название трайба <span class="req">*</span></label>
-          <input type="text" id="tribeName" name="tribeName" placeholder="Введите название трайба">
-        </div>
-        <div class="field">
-          <label class="field-label" for="gSymbolize">Что символизирует герб? <span class="req">*</span></label>
-          <textarea id="gSymbolize" name="gSymbolize" placeholder="Опишите символику герба"></textarea>
-        </div>
-        <div class="field">
-          <label class="field-label" for="tribeWork">Чем занимается трайб? <span class="req">*</span></label>
-          <textarea id="tribeWork" name="tribeWork" placeholder="Опишите деятельность трайба"></textarea>
-        </div>
-        <div class="field">
-          <label class="field-label" for="gSymbols">Символы / ассоциации / идеи <span class="req">*</span></label>
-          <textarea id="gSymbols" name="gSymbols" placeholder="Нейрон, шестеренка, стрелка вверх, компас…"></textarea>
-          <div class="hint">Нейрон · Мозг · Диаграмма · Стрелка вверх · Компас · Шестеренка</div>
-        </div>
-        <div class="field">
-          <label class="field-label" for="gColors">Цветовые пожелания</label>
-          <textarea id="gColors" name="gColors" placeholder="Например: тёмно-синий с золотом"></textarea>
-        </div>
-        <div class="field">
-          <label class="field-label" for="gRefs">Референсы</label>
-          <div class="upload-wrap">
-            <textarea id="gRefs" name="gRefs" placeholder="Ссылки или описание референсов" style="min-height:56px"></textarea>
-            <div class="upload-drop" id="gRefsDrop">
-              <input type="file" id="gRefsFiles" accept="image/*" multiple>
-              <span class="upload-drop-icon">🖼</span>
-              <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
-            </div>
-            <div class="upload-previews" id="gRefsPreviews"></div>
+          <div class="multi-label">
+            <label class="field-label">Содержит несколько гербов?</label>
           </div>
-        </div>
-        <div class="field">
-          <label class="field-label" for="gLimits">Ограничения</label>
-          <textarea id="gLimits" name="gLimits" placeholder="Что нельзя использовать?"></textarea>
-        </div>
-        <div class="field">
-          <label class="field-label">Предпочтительный стиль</label>
           <div class="pill-group">
             <label class="pill">
-              <input type="radio" name="gStyle" value="pixel">
-              <span>Пиксельный</span>
+              <input type="radio" name="multiGerb" value="no">
+              <span>Нет — один герб</span>
             </label>
             <label class="pill">
-              <input type="radio" name="gStyle" value="nopixel">
-              <span>Непиксельный</span>
-            </label>
-            <label class="pill">
-              <input type="radio" name="gStyle" value="any">
-              <span>Без предпочтений</span>
+              <input type="radio" name="multiGerb" value="yes">
+              <span>Да — несколько</span>
             </label>
           </div>
+        </div>
+
+        <!-- Один герб -->
+        <div class="cond" id="singleGerb">
+          <hr>
+          <div class="field">
+            <label class="field-label" for="tribeName">Название трайба <span class="req">*</span></label>
+            <input type="text" id="tribeName" name="tribeName" placeholder="Введите название трайба">
+          </div>
+          <div class="field">
+            <label class="field-label" for="gSymbols">Символы / ассоциации / идеи <span class="req">*</span></label>
+            <div class="upload-wrap">
+              <textarea id="gSymbols" name="gSymbols" placeholder="Нейрон, шестеренка, стрелка вверх, компас…"></textarea>
+              <div class="upload-drop" id="gSymbolsDrop">
+                <input type="file" id="gSymbolsFiles" accept="image/*" multiple>
+                <span class="upload-drop-icon">🖼</span>
+                <span class="upload-drop-text"><strong>Добавить рефы</strong> — перетащите или нажмите</span>
+              </div>
+              <div class="upload-previews" id="gSymbolsPreviews"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="gColors">Цветовые пожелания <span class="req">*</span></label>
+            <textarea id="gColors" name="gColors" placeholder="Например: тёмно-синий с золотом"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label" for="gRefs">Референсы</label>
+            <textarea id="gRefs" name="gRefs" placeholder="Ссылки или описание референсов" style="min-height:56px"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label" for="gLimits">Ограничения</label>
+            <textarea id="gLimits" name="gLimits" placeholder="Что нельзя использовать?"></textarea>
+          </div>
+          <div class="field">
+            <label class="field-label">Предпочтительный стиль</label>
+            <div class="pill-group">
+              <label class="pill">
+                <input type="radio" name="gStyle" value="pixel">
+                <span>Пиксельный</span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="gStyle" value="nopixel">
+                <span>Непиксельный</span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="gStyle" value="any">
+                <span>Без предпочтений</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Несколько гербов -->
+        <div class="cond" id="multiGerbBlock">
+          <hr>
+          <div class="field">
+            <label class="field-label">Предпочтительный стиль</label>
+            <div class="pill-group">
+              <label class="pill">
+                <input type="radio" name="gStyleMulti" value="pixel">
+                <span>Пиксельный</span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="gStyleMulti" value="nopixel">
+                <span>Непиксельный</span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="gStyleMulti" value="any">
+                <span>Без предпочтений</span>
+              </label>
+            </div>
+          </div>
+          <hr>
+          <div class="field">
+            <label class="field-label">Карточки гербов</label>
+          </div>
+          <div id="gerbCards"></div>
+          <button type="button" class="btn-add-card" id="btnAddGerb">+ Добавить герб</button>
+        </div>
+      </div>
+
+      <!-- 4. Изображение -->
+      <div class="section cond" id="secImage">
+        <div class="section-label">4 — Другое</div>
+
+        <div class="field">
+          <div class="multi-label">
+            <label class="field-label">Содержит несколько изображений?</label>
+          </div>
+          <div class="pill-group">
+            <label class="pill">
+              <input type="radio" name="multiImage" value="no">
+              <span>Нет — одно</span>
+            </label>
+            <label class="pill">
+              <input type="radio" name="multiImage" value="yes">
+              <span>Да — несколько</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Одно изображение -->
+        <div class="cond" id="singleImage">
+          <hr>
+          <div class="field">
+            <label class="field-label">Стиль изображения <span class="req">*</span></label>
+            <div class="pill-group">
+              <label class="pill pill-green">
+                <input type="radio" name="imgStyle" value="3d">
+                <span>3D</span>
+              </label>
+              <label class="pill pill-green">
+                <input type="radio" name="imgStyle" value="photo">
+                <span>Фотореализм</span>
+              </label>
+              <label class="pill pill-green">
+                <input type="radio" name="imgStyle" value="any">
+                <span>Без предпочтений</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="imgContext">Место расположения / контекст использования <span class="req">*</span></label>
+            <textarea id="imgContext" name="imgContext" placeholder="Опишите где будет использоваться изображение, прикрепите ссылку на область размещения или укажите размеры…"></textarea>
+            <div class="hint">Ссылка на область размещения · Скриншот где будет использоваться · Размеры (баннер, обложка и т.д.)</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Скриншот / макет места размещения</label>
+            <div class="upload-wrap">
+              <div class="upload-drop" id="imgContextDrop">
+                <input type="file" id="imgContextFiles" accept="image/*" multiple>
+                <span class="upload-drop-icon">🖼</span>
+                <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
+              </div>
+              <div class="upload-previews" id="imgContextPreviews"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="imgWishes">Доп. пожелания <span class="opt">(метафоры, рефы, ассоциации)</span></label>
+            <div class="upload-wrap">
+              <textarea id="imgWishes" name="imgWishes" placeholder="Опишите метафоры, ассоциации, дополнительные пожелания или ссылки на референсы…" style="min-height:72px"></textarea>
+              <div class="upload-drop" id="imgRefsDrop">
+                <input type="file" id="imgRefsFiles" accept="image/*" multiple>
+                <span class="upload-drop-icon">🖼</span>
+                <span class="upload-drop-text"><strong>Прикрепить референсы / метафоры</strong> — перетащите или нажмите</span>
+              </div>
+              <div class="upload-previews" id="imgRefsPreviews"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="imgLimits">Ограничения</label>
+            <textarea id="imgLimits" name="imgLimits" placeholder="Без текста, PNG без фона…" style="min-height:72px"></textarea>
+          </div>
+        </div>
+
+        <!-- Несколько изображений -->
+        <div class="cond" id="multiImage">
+          <hr>
+          <div class="field">
+            <div class="multi-label">
+              <label class="field-label">Карточки изображений</label>
+            </div>
+          </div>
+          <div id="imgCards"></div>
+          <button type="button" class="btn-add-card" id="btnAddImg">+ Добавить изображение</button>
         </div>
       </div>
 
@@ -736,8 +883,9 @@
     <!-- Footer -->
     <div class="card-foot" id="foot">
       <hr class="foot-divider">
-      <p class="foot-note">Не&nbsp;обязательно описывать готовый дизайн. Достаточно объяснить смысл объекта и&nbsp;указать символы или&nbsp;ассоциации, которые приходят вам&nbsp;в&nbsp;голову. Визуальную реализацию дизайнер предложит самостоятельно.</p>
-      <button type="submit" class="btn-submit">Сформировать заявку</button>
+      <div class="btn-submit-wrap" id="submitWrap">
+        <button type="submit" class="btn-submit" id="submitBtn" disabled>Сформировать заявку</button>
+      </div>
     </div>
     </form>
 
@@ -745,42 +893,150 @@
 </div>
 
 <script>
-  let cardIdx = 0;
+  let achCardIdx = 0;
+  let gerbCardIdx = 0;
 
   const on  = el => el?.classList.add('on');
   const off = el => el?.classList.remove('on');
 
-  // Type toggle
+  // ── Type toggle ──
+  function updateDeadlineVisibility() {
+    const type = document.querySelector('input[name="type"]:checked')?.value;
+    const df = document.getElementById('deadlineField');
+    if (type) on(df); else off(df);
+  }
+
   document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', () => {
-    if (r.value === 'achivka') { on(document.getElementById('secAch')); off(document.getElementById('secGerb')); }
-    else { off(document.getElementById('secAch')); on(document.getElementById('secGerb')); }
+    off(document.getElementById('secAch'));
+    off(document.getElementById('secGerb'));
+    off(document.getElementById('secImage'));
+    if (r.value === 'achivka') on(document.getElementById('secAch'));
+    else if (r.value === 'gerb') on(document.getElementById('secGerb'));
+    else if (r.value === 'image') on(document.getElementById('secImage'));
+    updateDeadlineVisibility();
   }));
 
-  // Multiple toggle
+  // ── Ачивка: single/multi toggle ──
   document.querySelectorAll('input[name="multi"]').forEach(r => r.addEventListener('change', () => {
     if (r.value === 'no') { on(document.getElementById('single')); off(document.getElementById('multi')); }
     else { off(document.getElementById('single')); on(document.getElementById('multi')); }
+    updateDeadlineVisibility();
   }));
 
-  // Theme toggle
+  // ── Ачивка: theme toggle ──
   document.querySelectorAll('input[name="theme"]').forEach(r => r.addEventListener('change', () => {
     r.value === 'yes' ? on(document.getElementById('themeBlock')) : off(document.getElementById('themeBlock'));
   }));
 
-  // Add achievement card
-  document.getElementById('btnAdd').addEventListener('click', () => {
-    cardIdx++;
-    const n = cardIdx;
+  // ── Герб: single/multi toggle ──
+  document.querySelectorAll('input[name="multiGerb"]').forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'no') { on(document.getElementById('singleGerb')); off(document.getElementById('multiGerbBlock')); }
+    else { off(document.getElementById('singleGerb')); on(document.getElementById('multiGerbBlock')); }
+    updateDeadlineVisibility();
+  }));
+
+  // ── Изображение: single/multi toggle ──
+  document.querySelectorAll('input[name="multiImage"]').forEach(r => r.addEventListener('change', () => {
+    if (r.value === 'no') { on(document.getElementById('singleImage')); off(document.getElementById('multiImage')); }
+    else { off(document.getElementById('singleImage')); on(document.getElementById('multiImage')); }
+    updateDeadlineVisibility();
+    checkValid();
+  }));
+
+  // ── Add image card ──
+  let imgCardCount = 0;
+  document.getElementById('btnAddImg').addEventListener('click', () => {
+    imgCardCount++;
+    const n = imgCardCount;
     const div = document.createElement('div');
     div.className = 'ach-card';
+    div.dataset.imgIdx = n;
+    div.innerHTML = `
+      <div class="ach-card-head">
+        <span class="ach-num">Изображение ${n}</span>
+        <button type="button" class="btn-del" onclick="this.closest('.ach-card').remove(); renumberImg(); checkValid()">✕</button>
+      </div>
+      <div class="field">
+        <label class="field-label">Стиль изображения <span class="req">*</span></label>
+        <div class="pill-group">
+          <label class="pill"><input type="radio" name="is_${n}" value="3d"><span>3D</span></label>
+          <label class="pill"><input type="radio" name="is_${n}" value="photo"><span>Фотореализм</span></label>
+          <label class="pill"><input type="radio" name="is_${n}" value="any"><span>Без предпочтений</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Место расположения / контекст использования <span class="req">*</span></label>
+        <textarea name="ic_${n}" placeholder="Опишите где будет использоваться изображение, прикрепите ссылку на область размещения или укажите размеры…"></textarea>
+        <div class="hint">Ссылка на область размещения · Скриншот где будет использоваться · Размеры (баннер, обложка и т.д.)</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Скриншот / макет места размещения</label>
+        <div class="upload-wrap">
+          <div class="upload-drop" id="imgCtxDrop_${n}">
+            <input type="file" id="imgCtxFiles_${n}" accept="image/*" multiple>
+            <span class="upload-drop-icon">🖼</span>
+            <span class="upload-drop-text"><strong>Прикрепить изображения</strong> — перетащите или нажмите</span>
+          </div>
+          <div class="upload-previews" id="imgCtxPreviews_${n}"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Доп. пожелания <span class="opt">(метафоры, рефы, ассоциации)</span></label>
+        <div class="upload-wrap">
+          <textarea name="iw_${n}" placeholder="Опишите метафоры, ассоциации, дополнительные пожелания или ссылки на референсы…" style="min-height:72px"></textarea>
+          <div class="upload-drop" id="imgRefDrop_${n}">
+            <input type="file" id="imgRefFiles_${n}" accept="image/*" multiple>
+            <span class="upload-drop-icon">🖼</span>
+            <span class="upload-drop-text"><strong>Прикрепить референсы / метафоры</strong> — перетащите или нажмите</span>
+          </div>
+          <div class="upload-previews" id="imgRefPreviews_${n}"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Дедлайн</label>
+        <input type="date" name="id_${n}">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="field-label">Ограничения</label>
+        <textarea name="il_${n}" placeholder="Без текста, PNG без фона…" style="min-height:64px"></textarea>
+      </div>
+    `;
+    document.getElementById('imgCards').appendChild(div);
+    uploadStores[`imgCtx_${n}`] = [];
+    uploadStores[`imgRef_${n}`] = [];
+    initUpload(`imgCtxFiles_${n}`, `imgCtxDrop_${n}`, `imgCtxPreviews_${n}`, `imgCtx_${n}`);
+    initUpload(`imgRefFiles_${n}`, `imgRefDrop_${n}`, `imgRefPreviews_${n}`, `imgRef_${n}`);
+    checkValid();
+  });
+
+  function renumberImg() {
+    document.querySelectorAll('#imgCards .ach-card .ach-num').forEach((el, i) => el.textContent = `Изображение ${i + 1}`);
+  }
+
+  // ── Add achievement card ──
+  document.getElementById('btnAddAch').addEventListener('click', () => {
+    achCardIdx++;
+    const n = achCardIdx;
+    const storeKey = `achCard_${n}`;
+    uploadStores[storeKey] = [];
+
+    const div = document.createElement('div');
+    div.className = 'ach-card';
+    div.dataset.achIdx = n;
     div.innerHTML = `
       <div class="ach-card-head">
         <span class="ach-num">Ачивка ${n}</span>
-        <button type="button" class="btn-del" onclick="this.closest('.ach-card').remove();renumber()">✕</button>
+        <button type="button" class="btn-del" onclick="this.closest('.ach-card').remove(); renumberAch(); checkValid()">✕</button>
       </div>
-      <div class="field">
-        <label class="field-label">Название ачивки <span class="req">*</span></label>
-        <input type="text" name="cn_${n}" placeholder="Введите название">
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Название ачивки <span class="req">*</span></label>
+          <input type="text" name="cn_${n}" placeholder="Введите название">
+        </div>
+        <div class="field">
+          <label class="field-label">Дедлайн</label>
+          <input type="date" name="cd_${n}">
+        </div>
       </div>
       <div class="field">
         <label class="field-label">За что выдается? <span class="req">*</span></label>
@@ -788,37 +1044,90 @@
       </div>
       <div class="field">
         <label class="field-label">Символы / ассоциации / идеи <span class="req">*</span></label>
-        <textarea name="cs_${n}" placeholder="Например: нейрон, мозг, кубок…"></textarea>
+        <div class="upload-wrap">
+          <textarea name="cs_${n}" placeholder="Например: нейрон, мозг, кубок…"></textarea>
+          <div class="upload-drop" id="achCardDrop_${n}">
+            <input type="file" id="achCardFiles_${n}" accept="image/*" multiple>
+            <span class="upload-drop-icon">🖼</span>
+            <span class="upload-drop-text"><strong>Добавить рефы</strong> — перетащите или нажмите</span>
+          </div>
+          <div class="upload-previews" id="achCardPreviews_${n}"></div>
+        </div>
       </div>
       <div class="field-row">
         <div class="field">
           <label class="field-label">Доп. элементы</label>
-          <textarea name="ce_${n}" style="min-height:64px" placeholder="Цифра 1, звёзды…"></textarea>
+          <textarea name="ce_${n}" style="min-height:64px" placeholder="Введите пожелания по метафорам и элементам"></textarea>
         </div>
         <div class="field">
           <label class="field-label">Цветовые пожелания</label>
-          <textarea name="cc_${n}" style="min-height:64px" placeholder="Синий и золотой…"></textarea>
+          <textarea name="cc_${n}" style="min-height:64px" placeholder="Введите пожелания по цветам"></textarea>
         </div>
       </div>
       <div class="field" style="margin-bottom:0">
-        <label class="field-label">Доп. пожелания</label>
-        <textarea name="cd_${n}" placeholder="Любые пожелания…"></textarea>
+        <label class="field-label">Ограничения</label>
+        <textarea name="cl_${n}" placeholder="Без текста, PNG без фона…"></textarea>
       </div>
     `;
-    document.getElementById('cards').appendChild(div);
+    document.getElementById('achCards').appendChild(div);
+    initUpload(`achCardFiles_${n}`, `achCardDrop_${n}`, `achCardPreviews_${n}`, storeKey);
+    checkValid();
   });
 
-  function renumber() {
-    document.querySelectorAll('.ach-card .ach-num').forEach((el, i) => el.textContent = `Ачивка ${i + 1}`);
+  function renumberAch() {
+    document.querySelectorAll('#achCards .ach-card .ach-num').forEach((el, i) => el.textContent = `Ачивка ${i + 1}`);
+  }
+
+  // ── Add герб card ──
+  document.getElementById('btnAddGerb').addEventListener('click', () => {
+    gerbCardIdx++;
+    const n = gerbCardIdx;
+
+    const div = document.createElement('div');
+    div.className = 'ach-card';
+    div.dataset.gerbIdx = n;
+    div.innerHTML = `
+      <div class="ach-card-head">
+        <span class="ach-num">Герб ${n}</span>
+        <button type="button" class="btn-del" onclick="this.closest('.ach-card').remove(); renumberGerb(); checkValid()">✕</button>
+      </div>
+      <div class="field">
+        <label class="field-label">Название трайба <span class="req">*</span></label>
+        <input type="text" name="gn_${n}" placeholder="Введите название трайба">
+      </div>
+      <div class="field">
+        <label class="field-label">Символы / ассоциации / идеи <span class="req">*</span></label>
+        <textarea name="gs_${n}" placeholder="Нейрон, шестеренка, стрелка вверх…"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Дедлайн</label>
+        <input type="date" name="gd_${n}">
+      </div>
+      <div class="field">
+        <label class="field-label">Цветовые пожелания</label>
+        <textarea name="gc_${n}" placeholder="Тёмно-синий с золотом…"></textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="field-label">Ограничения</label>
+        <textarea name="gl_${n}" placeholder="Что нельзя использовать?"></textarea>
+      </div>
+    `;
+    document.getElementById('gerbCards').appendChild(div);
+    checkValid();
+  });
+
+  function renumberGerb() {
+    document.querySelectorAll('#gerbCards .ach-card .ach-num').forEach((el, i) => el.textContent = `Герб ${i + 1}`);
   }
 
   // ── Upload helpers ──
-  const uploadStores = { aRefs: [], gRefs: [] };
+  const uploadStores = { aSymbols: [], gSymbols: [], imgContext: [], imgRefs: [] };
 
   function initUpload(inputId, dropId, previewsId, storeKey) {
     const input    = document.getElementById(inputId);
     const drop     = document.getElementById(dropId);
     const previews = document.getElementById(previewsId);
+    if (!input || !drop || !previews) return;
 
     function addFiles(files) {
       [...files].forEach(file => {
@@ -826,6 +1135,7 @@
         const reader = new FileReader();
         reader.onload = e => {
           const dataUrl = e.target.result;
+          if (!uploadStores[storeKey]) uploadStores[storeKey] = [];
           uploadStores[storeKey].push(dataUrl);
           const idx = uploadStores[storeKey].length - 1;
 
@@ -848,8 +1158,10 @@
     drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
   }
 
-  initUpload('aRefsFiles', 'aRefsDrop', 'aRefsPreviews', 'aRefs');
-  initUpload('gRefsFiles', 'gRefsDrop', 'gRefsPreviews', 'gRefs');
+  initUpload('aSymbolsFiles', 'aSymbolsDrop', 'aSymbolsPreviews', 'aSymbols');
+  initUpload('gSymbolsFiles', 'gSymbolsDrop', 'gSymbolsPreviews', 'gSymbols');
+  initUpload('imgContextFiles', 'imgContextDrop', 'imgContextPreviews', 'imgContext');
+  initUpload('imgRefsFiles', 'imgRefsDrop', 'imgRefsPreviews', 'imgRefs');
 
   // ── Campus other ──
   document.getElementById('campusSelect').addEventListener('change', function() {
@@ -858,26 +1170,104 @@
     if (this.value === 'other') other.focus();
   });
 
-
-  // Submit → генерация HTML-файла
-  document.getElementById('form').addEventListener('submit', e => {
-    e.preventDefault();
-
-    const typeEl  = document.querySelector('input[name="type"]:checked');
+  // ── Submit → генерация HTML-файла ──
+  function checkValid() {
+    const typeEl = document.querySelector('input[name="type"]:checked');
     const campusSelect = document.getElementById('campusSelect').value;
     const campus = campusSelect === 'other'
       ? document.getElementById('campusOther').value.trim()
       : campusSelect;
-    const title   = document.getElementById('reqTitle').value.trim();
-    const deadline = document.getElementById('deadline').value;
+    const globalDeadline = document.getElementById('globalDeadline')?.value;
+    const dlVisible = document.getElementById('deadlineField')?.classList.contains('on');
+    let ok = !!(typeEl && campus && (!dlVisible || globalDeadline));
+
+    if (ok && typeEl) {
+      const type = typeEl.value;
+      const multi = document.querySelector('input[name="multi"]:checked')?.value;
+      if (type === 'achivka') {
+        if (multi === 'no') {
+          ok = !!(v('aName') && v('aReason') && v('aSymbols'));
+        } else if (multi === 'yes') {
+          const cards = document.querySelectorAll('#achCards .ach-card');
+          ok = cards.length >= 2 && Array.from(cards).every(card => {
+            const n = card.dataset.achIdx;
+            return card.querySelector(`[name="cn_${n}"]`)?.value.trim() &&
+                   card.querySelector(`[name="cr_${n}"]`)?.value.trim() &&
+                   card.querySelector(`[name="cs_${n}"]`)?.value.trim();
+          });
+        } else { ok = false; }
+      } else if (type === 'gerb') {
+        const gmulti = document.querySelector('input[name="multiGerb"]:checked')?.value;
+        if (gmulti === 'no') {
+          ok = !!(v('tribeName') && v('gSymbols') && v('gColors'));
+        } else if (gmulti === 'yes') {
+          const gcards = document.querySelectorAll('#gerbCards .ach-card');
+          ok = gcards.length >= 2 && Array.from(gcards).every(card => {
+            const n = card.dataset.gerbIdx;
+            return card.querySelector(`[name="gn_${n}"]`)?.value.trim() &&
+                   card.querySelector(`[name="gs_${n}"]`)?.value.trim();
+          });
+        } else { ok = false; }
+      } else if (type === 'image') {
+        const imgMulti = document.querySelector('input[name="multiImage"]:checked')?.value;
+        if (imgMulti === 'no') {
+          ok = !!(document.querySelector('input[name="imgStyle"]:checked') && v('imgContext'));
+        } else if (imgMulti === 'yes') {
+          const icards = document.querySelectorAll('#imgCards .ach-card');
+          ok = icards.length >= 2 && Array.from(icards).every(card => {
+            const n = card.dataset.imgIdx;
+            return card.querySelector(`[name="is_${n}"]:checked`) &&
+                   card.querySelector(`[name="ic_${n}"]`)?.value.trim();
+          });
+        } else { ok = false; }
+      }
+    }
+
+    const btn = document.getElementById('submitBtn');
+    const wrap = document.getElementById('submitWrap');
+    btn.disabled = !ok;
+    if (!ok) {
+      const typeEl2 = document.querySelector('input[name="type"]:checked');
+      const multi2 = document.querySelector('input[name="multi"]:checked')?.value;
+      const gmulti2 = document.querySelector('input[name="multiGerb"]:checked')?.value;
+      const isMultiAch = typeEl2?.value === 'achivka' && multi2 === 'yes'
+        && document.querySelectorAll('#achCards .ach-card').length < 2;
+      const isMultiGerb = typeEl2?.value === 'gerb' && gmulti2 === 'yes'
+        && document.querySelectorAll('#gerbCards .ach-card').length < 2;
+      const imgMulti2 = document.querySelector('input[name="multiImage"]:checked')?.value;
+      const isMultiImg = typeEl2?.value === 'image' && imgMulti2 === 'yes';
+      wrap.setAttribute('data-tip', isMultiAch
+        ? 'Вы выбрали тип задачи на создание нескольких ачивок. Чтобы сформировать заявку, добавьте и опишите все ачивки'
+        : isMultiGerb
+        ? 'Вы выбрали тип задачи на создание гербов. Чтобы сформировать заявку, добавьте и опишите все гербы'
+        : isMultiImg
+        ? 'Вы выбрали тип задачи на создание нескольких изображений. Чтобы сформировать заявку, добавьте и опишите все изображения'
+        : 'Чтобы сформировать заявку, заполните обязательные поля');
+    } else {
+      wrap.removeAttribute('data-tip');
+    }
+  }
+
+  document.getElementById('form').addEventListener('input', checkValid);
+  document.getElementById('form').addEventListener('change', checkValid);
+  checkValid();
+
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const typeEl = document.querySelector('input[name="type"]:checked');
+    const campusSelect = document.getElementById('campusSelect').value;
+    const campus = campusSelect === 'other'
+      ? document.getElementById('campusOther').value.trim()
+      : campusSelect;
     const missing = [];
-    if (!typeEl)   missing.push('Тип объекта');
-    if (!campus)   missing.push('Кампус');
-    if (!title)    missing.push('Название заявки');
-    if (!deadline) missing.push('Дедлайн');
+    if (!typeEl)  missing.push('Тип объекта');
+    if (!campus)  missing.push('Кампус');
+
     if (missing.length) { alert('Заполните обязательные поля:\n• ' + missing.join('\n• ')); return; }
 
-    downloadHTML(typeEl.value, campus, title, deadline);
+    const type = typeEl.value;
+    downloadHTML(type, campus);
 
     document.getElementById('formBody').style.display = 'none';
     document.getElementById('foot').style.display = 'none';
@@ -901,7 +1291,14 @@
       </div>`;
   }
 
+  function fmtDate(val) {
+    if (!val) return '';
+    const [y,m,d] = val.split('-');
+    return `${d}.${m}.${y}`;
+  }
+
   function imagesBlock(store) {
+    if (!store) return '';
     const imgs = store.filter(Boolean);
     if (!imgs.length) return '';
     return `<div class="images">${imgs.map(src => `<img src="${src}">`).join('')}</div>`;
@@ -911,20 +1308,15 @@
     return `<div class="section"><div class="section-title">${num} — ${esc(title)}</div>${content}</div>`;
   }
 
-  function downloadHTML(type, campus, title, deadline) {
-    let deadlineFmt = deadline;
-    if (deadline) { const [y,m,d] = deadline.split('-'); deadlineFmt = `${d}.${m}.${y}`; }
-
-    const typeLabel = type === 'achivka' ? 'Ачивка' : 'Герб трайба';
+  function downloadHTML(type, campus) {
+    const typeLabels = { achivka: 'Ачивка', gerb: 'Герб трайба', image: 'Другое' };
     const dateStr = new Date().toLocaleDateString('ru-RU');
 
-    // Секция 1
+    // Секция 1 — Общая
     let body = section('1', 'Общая информация',
-      field('Тип объекта', typeLabel) +
+      field('Тип объекта', typeLabels[type] || type) +
       field('Кампус', campus) +
-      field('Название заявки', title) +
-      field('Дедлайн', deadlineFmt) +
-      field('Контекст создания', v('context'), true)
+      field('Дедлайн', fmtDate(document.getElementById('globalDeadline').value), true)
     );
 
     // Секция 2 — Ачивки
@@ -937,26 +1329,36 @@
           field('Название ачивки', v('aName')) +
           field('За что выдается?', v('aReason')) +
           field('Символы / ассоциации / идеи', v('aSymbols')) +
+          imagesBlock(uploadStores['aSymbols']) +
           field('Дополнительные элементы', v('aExtra'), true) +
           field('Цветовые пожелания', v('aColors'), true) +
-          field('Референсы', v('aRefs'), true) +
-          imagesBlock(uploadStores['aRefs']) +
           field('Ограничения', v('aLimits'), true);
 
       } else if (multi === 'yes') {
-        const unified = rv('unifiedTheme');
+        const unified = rv('theme');
         achContent += field('Объединены одной темой', unified === 'yes' ? 'Да' : 'Нет');
         if (unified === 'yes') {
           achContent += field('Тема серии', v('serTheme')) + field('Общие пожелания к серии', v('serNotes'), true);
         }
-        document.querySelectorAll('.ach-card').forEach((card, i) => {
-          const labels = card.querySelectorAll('.field-label');
-          const inputs = card.querySelectorAll('input[type="text"], textarea');
-          let cardContent = '';
-          labels.forEach((lbl, idx) => {
-            const inp = inputs[idx];
-            if (inp) cardContent += field(lbl.textContent.replace('*','').trim(), inp.value.trim(), idx > 2);
-          });
+        document.querySelectorAll('#achCards .ach-card').forEach((card, i) => {
+          const n = card.dataset.achIdx;
+          const getName  = card.querySelector(`[name="cn_${n}"]`);
+          const getDate  = card.querySelector(`[name="cd_${n}"]`);
+          const getReason= card.querySelector(`[name="cr_${n}"]`);
+          const getSymb  = card.querySelector(`[name="cs_${n}"]`);
+          const getExtra = card.querySelector(`[name="ce_${n}"]`);
+          const getColor = card.querySelector(`[name="cc_${n}"]`);
+          const getLim   = card.querySelector(`[name="cl_${n}"]`);
+          const storeKey = `achCard_${n}`;
+          let cardContent =
+            field('Название ачивки', getName ? getName.value.trim() : '') +
+            field('Дедлайн', fmtDate(getDate ? getDate.value : '')) +
+            field('За что выдается?', getReason ? getReason.value.trim() : '') +
+            field('Символы / ассоциации / идеи', getSymb ? getSymb.value.trim() : '') +
+            imagesBlock(uploadStores[storeKey]) +
+            field('Доп. элементы', getExtra ? getExtra.value.trim() : '', true) +
+            field('Цветовые пожелания', getColor ? getColor.value.trim() : '', true) +
+            field('Ограничения', getLim ? getLim.value.trim() : '', true);
           achContent += `<div class="ach-card"><div class="ach-title">Ачивка ${i+1}</div>${cardContent}</div>`;
         });
       }
@@ -966,25 +1368,62 @@
 
     // Секция 3 — Герб
     if (type === 'gerb') {
+      const multi = rv('multiGerb');
+      let gerbContent = '';
       const styleMap = { pixel: 'Пиксельный', nopixel: 'Непиксельный', any: 'Без предпочтений' };
-      body += section('3', 'Для герба трайба',
-        field('Название трайба', v('tribeName')) +
-        field('Что символизирует герб?', v('gSymbolize')) +
-        field('Чем занимается трайб?', v('tribeWork')) +
-        field('Символы / ассоциации / идеи', v('gSymbols')) +
-        field('Цветовые пожелания', v('gColors'), true) +
-        field('Референсы', v('gRefs'), true) +
-        imagesBlock(uploadStores['gRefs']) +
-        field('Ограничения', v('gLimits'), true) +
-        field('Предпочтительный стиль', styleMap[rv('gStyle')] || '', true)
-      );
+
+      if (multi === 'no') {
+        gerbContent =
+          field('Название трайба', v('tribeName')) +
+          field('Символы / ассоциации / идеи', v('gSymbols')) +
+          imagesBlock(uploadStores['gSymbols']) +
+          field('Цветовые пожелания', v('gColors')) +
+          field('Референсы', v('gRefs'), true) +
+          field('Ограничения', v('gLimits'), true) +
+          field('Предпочтительный стиль', styleMap[rv('gStyle')] || '', true);
+
+      } else if (multi === 'yes') {
+        gerbContent += field('Предпочтительный стиль', styleMap[rv('gStyleMulti')] || '', true);
+        document.querySelectorAll('#gerbCards .ach-card').forEach((card, i) => {
+          const n = card.dataset.gerbIdx;
+          const getName  = card.querySelector(`[name="gn_${n}"]`);
+          const getSymb  = card.querySelector(`[name="gs_${n}"]`);
+          const getDate  = card.querySelector(`[name="gd_${n}"]`);
+          const getColor = card.querySelector(`[name="gc_${n}"]`);
+          const getLim   = card.querySelector(`[name="gl_${n}"]`);
+          let cardContent =
+            field('Название трайба', getName ? getName.value.trim() : '') +
+            field('Символы / ассоциации / идеи', getSymb ? getSymb.value.trim() : '') +
+            field('Дедлайн', fmtDate(getDate ? getDate.value : '')) +
+            field('Цветовые пожелания', getColor ? getColor.value.trim() : '', true) +
+            field('Ограничения', getLim ? getLim.value.trim() : '', true);
+          gerbContent += `<div class="ach-card"><div class="ach-title">Герб ${i+1}</div>${cardContent}</div>`;
+        });
+      }
+
+      body += section('3', 'Для герба трайба', gerbContent);
+    }
+
+    // Секция 4 — Изображение
+    if (type === 'image') {
+      const imgStyleMap = { '3d': '3D', photo: 'Фотореализм', any: 'Без предпочтений' };
+      const multiImg = rv('multiImage');
+      let imgContent =
+        field('Количество', multiImg === 'yes' ? 'Несколько' : 'Одно') +
+        field('Стиль', imgStyleMap[rv('imgStyle')] || '', true) +
+        field('Место расположения / контекст использования', v('imgContext')) +
+        imagesBlock(uploadStores['imgContext']) +
+        field('Доп. пожелания', v('imgWishes'), true) +
+        imagesBlock(uploadStores['imgRefs']) +
+        field('Ограничения', v('imgLimits'), true);
+      body += section('4', 'Другое', imgContent);
     }
 
     const html = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Заявка — ${esc(title)}</title>
+<title>Заявка — Graphic Asset Request</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
@@ -1026,8 +1465,7 @@
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    const safeName = title.replace(/[^а-яёА-ЯЁa-zA-Z0-9\s]/g,'').trim().replace(/\s+/g,'_');
-    a.download = `Заявка_${safeName || 'graphic_asset'}.html`;
+    a.download = `Заявка_graphic_asset_${dateStr.replace(/\./g,'-')}.html`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
