@@ -726,10 +726,7 @@
             <label class="field-label" for="gColors">Цветовые пожелания <span class="req">*</span></label>
             <textarea id="gColors" name="gColors" placeholder="Например: тёмно-синий с золотом"></textarea>
           </div>
-          <div class="field">
-            <label class="field-label" for="gRefs">Референсы</label>
-            <textarea id="gRefs" name="gRefs" placeholder="Ссылки или описание референсов" style="min-height:56px"></textarea>
-          </div>
+
           <div class="field">
             <label class="field-label" for="gLimits">Ограничения</label>
             <textarea id="gLimits" name="gLimits" placeholder="Что нельзя использовать?"></textarea>
@@ -1102,16 +1099,20 @@
       </div>
       <div class="field">
         <label class="field-label">Символы / ассоциации / идеи <span class="req">*</span></label>
-        <textarea name="gs_${n}" placeholder="Нейрон, шестеренка, стрелка вверх…"></textarea>
+        <div class="upload-wrap">
+          <textarea name="gs_${n}" placeholder="Нейрон, шестеренка, стрелка вверх, компас…"></textarea>
+          <div class="upload-drop" id="gerbCardDrop_${n}">
+            <input type="file" id="gerbCardFiles_${n}" accept="image/*" multiple>
+            <span class="upload-drop-icon">🖼</span>
+            <span class="upload-drop-text"><strong>Добавить рефы</strong> — перетащите или нажмите</span>
+          </div>
+          <div class="upload-previews" id="gerbCardPreviews_${n}"></div>
+        </div>
         <div class="hint">Если у вас нет идей, напишите: «На усмотрение дизайнера»</div>
       </div>
       <div class="field">
-        <label class="field-label">Дедлайн</label>
-        <input type="date" name="gd_${n}">
-      </div>
-      <div class="field">
-        <label class="field-label">Цветовые пожелания</label>
-        <textarea name="gc_${n}" placeholder="Тёмно-синий с золотом…"></textarea>
+        <label class="field-label">Цветовые пожелания <span class="req">*</span></label>
+        <textarea name="gc_${n}" placeholder="Например: тёмно-синий с золотом"></textarea>
       </div>
       <div class="field" style="margin-bottom:0">
         <label class="field-label">Ограничения</label>
@@ -1119,6 +1120,7 @@
       </div>
     `;
     document.getElementById('gerbCards').appendChild(div);
+    initUpload(`gerbCardFiles_${n}`, `gerbCardDrop_${n}`, `gerbCardPreviews_${n}`, `gerbCard_${n}`);
     checkValid();
   });
 
